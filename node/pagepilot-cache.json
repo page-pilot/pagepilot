@@ -1,0 +1,5 @@
+{
+  "Click the search text input area": "role=combobox[name='Search']",
+  "If a login popup is visible, close it. Then click the search text input field (not the button).": "role=textbox[name='Search for Products, Brands and More']",
+  "Click the login button": "button:has-text(\"Login\")"
+}
