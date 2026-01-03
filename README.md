@@ -1,64 +1,145 @@
-# PagePilot
+# PagePilot 🚀
 
-PagePilot is a Self-Healing Playwright Automation library.
+**The Autonomous, Self-Healing Browser Agent for High-Scale Web Automation.**
 
-## Packages
+[![npm version](https://img.shields.io/npm/v/@pagepilot/pagepilot.svg)](https://www.npmjs.com/package/@pagepilot/pagepilot)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- [Node.js Package](./node)
-- [Python Package](./python)
+PagePilot is a next-generation automation library built on top of **Playwright**. It transforms brittle, selector-based scripts into resilient, autonomous agents capable of navigating complex websites, bypassing anti-bot protections, and essentially "thinking" their way through tasks.
 
-## High-Level Architecture & Plan
+---
 
-### Core Philosophy: "Cache-First, AI-Fallback"
-PagePilot is designed to be a resilient automation layer on top of Playwright. It solves the fragility of selector-based automation by using a hybrid approach:
-1.  **Cache Lookup**: Ideally, we already know the selector/code for a semantic action (e.g., "Login").
-2.  **AI Generation**: If not cached, we use an LLM (OpenAI) to inspect the DOM and generate the Playwright code on the fly.
-3.  **Self-Healing**: The generated code is executed and then cached. If it fails in the future, we fall back to AI generation again to "heal" the broken selector.
+## 🌟 Why PagePilot?
+
+Traditional web automation is fragile. One CSS change breaks your entire suite.
+**PagePilot** solves this by combining **computer vision (accessibility trees)** with **Large Language Models (LLMs)** to understand the page like a human user.
+
+### Key Features
+
+*   **🛡️ Self-Healing Selectors**
+    *   Never hardcode a CSS selector again. PagePilot analyzes the DOM semantically. If the UI changes, the agent adapts instantly without breaking the test.
+
+*   **⚡ Auto-Parallelization (Manager-Worker Architecture)**
+    *   **The Orchestrator:** Give PagePilot a complex goal like *"Compare iPhone prices on Amazon, Flipkart, and Reliance Digital"*.
+    *   **Magic:** It automatically decomposes the request into sub-goals and spins up parallel browser contexts to execute them simultaneously, slashing execution time.
+
+*   **🥷 Stealth Mode**
+    *   Built-in integration with `puppeteer-extra-plugin-stealth` and `playwright-extra`.
+    *   Automatically evades bot detection systems (Cloudflare, Akamai) by mimicking human fingerprints and behavior.
+
+*   **🧠 Human-Like Interaction**
+    *   **Smart specific Scroll:** Uses "Human Scroll" logic to trigger lazy-loading elements just like a real user.
+    *   **Passive Scanning:** Constantly scans the viewport for goal completion (e.g., verifying a price appeared) to exit tasks early and save resources.
+
+---
+
+## 🏗️ Architecture
+
+PagePilot functions on a **Manager-Worker** model to ensure scalability and isolation.
 
 ```mermaid
 graph TD
-    A[Test Step: "Click Login"] --> B{Check Cache}
-    B -- Hit --> C[Execute Cached Selector]
-    B -- Miss --> D[Capture Accessibility Tree]
-    D --> E[Send to OpenAI GPT-4o]
-    E --> F[Receive Selector]
-    F --> C
-    F --> G[Update Cache]
-    C --> H[Success]
+    User["User Goal"] --> Orchestrator["Orchestrator (Manager)"]
+    Orchestrator -->|Decompose| Planner{"AI Planner"}
+    Planner -->|Sub-Goal 1| Worker1["PagePilot Worker 1"]
+    Planner -->|Sub-Goal 2| Worker2["PagePilot Worker 2"]
+    Planner -->|Sub-Goal 3| Worker3["PagePilot Worker 3"]
+    
+    Worker1 -->|Stealth Ctx| Amazon["Amazon.in"]
+    Worker2 -->|Stealth Ctx| Flipkart["Flipkart.com"]
+    Worker3 -->|Stealth Ctx| Reliance["RelianceDigital.in"]
+    
+    Worker1 -->|Result| Aggregator["Context Merger"]
+    Worker2 -->|Result| Aggregator
+    Worker3 -->|Result| Aggregator
+    
+    Aggregator --> FinalResult["Final JSON Output"]
 ```
 
-## Quick Start
+---
+
+## 📦 Installation
+
+```bash
+npm install @pagepilot/pagepilot
+```
+
+## 🚀 Usage
+
+### 1. Basic Setup (Single Task)
+
+Perfect for scraping, testing, or simple automation.
 
 ```typescript
-// 1. Install
-// npm install pagepilot
+import { chromium } from 'playwright-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Orchestrator } from '@pagepilot/pagepilot';
 
-// 2. Use
-import { PagePilot } from 'pagepilot';
+// 1. Setup Stealth Browser
+chromium.use(StealthPlugin());
+const browser = await chromium.launch({ headless: false });
+const page = await browser.newPage();
 
-const pilot = new PagePilot(page, process.env.OPENAI_API_KEY);
+// 2. Initialize Agent
+const agent = new Orchestrator(page, {
+  provider: 'portkey',
+  apiKey: process.env.PORTKEY_API_KEY!
+});
 
-// 🛑 Old Way (Brittle)
-// await page.click('div > .btn-primary-2'); 
+// 3. Execute Semantic Goal
+const result = await agent.execute(
+  "Go to amazon.in, search for 'Sony WH-1000XM5', and extract the price."
+);
 
-// ✅ New Way (Self-Healing)
-await pilot.act("Click the 'Sign Up' button inside the modal");
+console.log(result);
+// Output: { price: "₹24,990" }
+
+await browser.close();
 ```
 
-### Repository Structure
-- **`node/`**: The primary TypeScript implementation. This is where the main `PagePilot` class lives, designed to be imported into existing Playwright test suites.
-- **`python/`**: The Python mirror of the library, ensuring data scientists and Python-based QA engineers have the same "self-healing" capabilities.
+### 2. Auto-Parallel Execution
 
-### Roadmap
-1.  **Phase 1: Foundation (Done)**
-    - Monorepo setup with workspaces.
-    - Basic `PagePilot` class in TS and Python.
-    - Simple "Act" method implementation.
+The real power of PagePilot. Send one complex prompt, and watch it swarm.
 
-2.  **Phase 2: Enhanced Context**
-    - Implement Accessibility Tree serialization (AXTree) instead of raw HTML. This reduces token usage by 90% and improves AI accuracy by removing non-interactive noise.
-    - Add visual debugging (screenshots sent to GPT-4o).
+```typescript
+const goal = `
+  Compare the price of 'iPhone 15 128GB' on:
+  1. Amazon.in (save as amazon_price)
+  2. Flipkart.com (save as flipkart_price)
+  3. Croma.com (save as croma_price)
+`;
 
-3.  **Phase 3: Shared Caching**
-    - Implement a persistent sidecar or cloud service to share the "Action Cache" across different test runs and even different users.
+// The Orchestrator detects multiple distinct tasks and runs them in parallel
+const results = await agent.execute(goal);
 
+console.table(results);
+```
+
+---
+
+## 🔧 Configuration
+
+PagePilot uses **Portkey** for robust AI gateway management. This ensures reliability, retries, and observability for your AI calls.
+
+Create a `.env` file:
+
+```env
+PORTKEY_API_KEY=your_portkey_api_key
+PORTKEY_VIRTUAL_KEY=optional_virtual_key
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+1.  Fork the repo
+2.  Create your feature branch (`git checkout -b feature/amazing-feature`)
+3.  Commit your changes (`git commit -m 'feat: Add some amazing feature'`)
+4.  Push to the branch (`git push origin feature/amazing-feature`)
+5.  Open a Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
