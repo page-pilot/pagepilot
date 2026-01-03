@@ -1,6 +1,10 @@
 {
-    "name": "pagepilot",
+    "name": "@page-pilot/pagepilot",
     "version": "1.0.0",
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "description": "A self-healing, stealthy, and auto-parallelizing Playwright agent for autonomous web tasks.",
