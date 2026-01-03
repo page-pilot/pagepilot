@@ -3,16 +3,23 @@
     "version": "1.0.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "description": "A self-healing, stealthy, and auto-parallelizing Playwright agent for autonomous web tasks.",
+    "author": "Akshat Khosya",
+    "license": "MIT",
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsc",
+        "prepublishOnly": "npm run build",
         "test": "vitest run"
     },
     "dependencies": {
-        "@anthropic-ai/sdk": "^0.71.2",
         "dotenv": "^17.2.3",
-        "openai": "^6.15.0",
         "playwright": "^1.57.0",
+        "playwright-extra": "^4.3.6",
         "portkey-ai": "^3.0.1",
+        "puppeteer-extra-plugin-stealth": "^2.11.2",
         "zod": "^4.3.4"
     },
     "devDependencies": {
