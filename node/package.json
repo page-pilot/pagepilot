@@ -1,13 +1,36 @@
 {
     "name": "@pagepilot/pagepilot",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
     },
+    "description": "An adaptive, resilient, and autonomous Playwright agent for complex web automation.",
+    "keywords": [
+        "playwright",
+        "automation",
+        "agent",
+        "ai",
+        "adaptive",
+        "resilient",
+        "autonomous",
+        "stealth",
+        "scraping",
+        "testing",
+        "bot",
+        "portkey",
+        "llm"
+    ],
+    "homepage": "https://github.com/page-pilot/pagepilot#readme",
+    "bugs": {
+        "url": "https://github.com/page-pilot/pagepilot/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/page-pilot/pagepilot.git"
+    },
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
-    "description": "A self-healing, stealthy, and auto-parallelizing Playwright agent for autonomous web tasks.",
     "author": "Akshat Khosya",
     "license": "MIT",
     "files": [
