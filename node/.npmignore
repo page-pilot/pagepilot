@@ -1,0 +1,9 @@
+# NPM Ignore
+src/
+tests/
+tsconfig.json
+vitest.config.ts
+.env
+.gitignore
+.git/
+test-lazy.ts
